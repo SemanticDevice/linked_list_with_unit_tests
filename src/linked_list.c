@@ -27,9 +27,14 @@ enum ll_status ll_delete(struct ll_node **head, unsigned int idx) {
   return LL_OK;
 }
 
+enum ll_status ll_destroy(struct ll_node **head) {
+  (void)head;  // temp to prevent compiler complaining about unused parameter
+  return LL_OK;
+}
+
 void *ll_get(struct ll_node *head, unsigned int idx) {
-  (void)head;
-  (void)idx;
+  (void)head;  // temp to prevent compiler complaining about unused parameter
+  (void)idx;   // temp to prevent compiler complaining about unused parameter
   return NULL;
 }
 

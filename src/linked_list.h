@@ -36,6 +36,11 @@ enum ll_status ll_insert_after(struct ll_node **head, unsigned int idx,
 enum ll_status ll_delete(struct ll_node **head, unsigned int idx);
 
 /**
+ * Destroy the whole list. Dealocate memory allocated for the list.
+ */
+enum ll_status ll_destroy(struct ll_node **head);
+
+/**
  * Return node data at index specified by @p idx. Return NULL if @p idx is out
  * of range.
  */
