@@ -18,5 +18,5 @@ CFLAGS += -Wold-style-definition
 INC_DIRS = -Iunity
 INC_DIRS += -I../src
 
-test_linked_list: test_linked_list.c
-	$(CC) $(CFLAGS) $(INC_DIRS) unity/unity.c test_linked_list.c -o test_linked_list
+test_linked_list: ../src/linked_list.c test_linked_list.c
+	$(CC) $(CFLAGS) $(INC_DIRS) ../src/linked_list.c unity/unity.c test_linked_list.c -o test_linked_list
