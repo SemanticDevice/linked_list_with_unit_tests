@@ -1,6 +1,7 @@
 CC=gcc
 
-CFLAGS = -std=c99
+CFLAGS = -ggdb
+CFLAGS += -std=c99
 CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -Wpointer-arith
