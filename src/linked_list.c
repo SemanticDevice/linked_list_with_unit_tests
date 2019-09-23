@@ -18,7 +18,8 @@ enum ll_status ll_prepend(struct ll_node **head, void *data) {
 /**
  * Insert @p data after the list node at index @p idx.
  */
-enum ll_status ll_insert_after(struct ll_node **head, int idx, void *data) {
+enum ll_status ll_insert_after(struct ll_node **head, unsigned int idx,
+                               void *data) {
   (void)head;  // temp to prevent compiler complaining about unused parameter
   (void)idx;   // temp to prevent compiler complaining about unused parameter
   (void)data;  // temp to prevent compiler complaining about unused parameter
@@ -27,7 +28,7 @@ enum ll_status ll_insert_after(struct ll_node **head, int idx, void *data) {
 /**
  * Delete list node at index @p idx.
  */
-enum ll_status ll_delete(struct ll_node **head, int idx) {
+enum ll_status ll_delete(struct ll_node **head, unsigned int idx) {
   (void)head;  // temp to prevent compiler complaining about unused parameter
   (void)idx;   // temp to prevent compiler complaining about unused parameter
   return LL_OK;
