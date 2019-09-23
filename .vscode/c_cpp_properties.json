@@ -22,7 +22,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "include",
+                "src",
+                "test/unity",
                 "/usr/include"
             ],
             "defines": [
