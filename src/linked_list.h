@@ -25,6 +25,11 @@ enum ll_status ll_append(struct ll_node **head, void *data);
 enum ll_status ll_prepend(struct ll_node **head, void *data);
 
 /**
+ * Set node at indiex @p idx to @p data.
+ */
+enum ll_status ll_set(struct ll_node *head, unsigned int idx, void *data);
+
+/**
  * Insert @p data after the list node at index @p idx.
  */
 enum ll_status ll_insert_after(struct ll_node **head, unsigned int idx,
@@ -54,9 +59,11 @@ unsigned int ll_length(struct ll_node *head);
 /**
  * Iterate over the list calling @p cb function at every node until every node
  * is visited or until the @p cb function returns LL_FAIL to indicate that the
- * iteration should stop.
+ * iteration should stop. Callback function gets a list node pointer and
+ * the opaque cookie that was passed by the caller.
  */
 void ll_iterate(struct ll_node *head,
-                enum ll_status (*cb)(struct ll_node *node));
+                enum ll_status (*cb)(struct ll_node *node, void *cookie),
+                void *cookie);
 
 #endif  // LINKED_LIST_H

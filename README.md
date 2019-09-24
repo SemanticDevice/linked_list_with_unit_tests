@@ -67,4 +67,49 @@ test_linked_list.c:25:test_ll_iterate:PASS
 OK
 ```
 
-### Write the Tests
+### Write the Tests and Implement Linked List API
+
+As much as it would seem to be cleaner to write test cases independently of writing code-under-test, it is not practical because test code needs to be tested as well and without code-under-test to test the test code it is not possible. Sure, a simpler implementation of linked list API can be developed for the sole purpose of testing test code, but that's throw-away code and it itself needs to be tested. All this to say is that test case development and linked list implementation in this case was done iteratively.
+
+Test code was structured so as not to rely on linked list functions to test other linked list functions. `ll_destroy()` was one unavoidable exception to that rule. This meant that test coded needed to create its own linked list to compare with the list produced by code-under-test, which, in turn, meant that test code needed to access internal `struct ll_node` members directly. This is fine until someone decides to make this into a doubly linked list for example, which will lead to the test code having to be modified while the API might not change. If test code did not rely on internal knowledge of node structure and only used linked list API for testing, then changing the nature of the linked list down the road may not require changing the tests.
+
+1. Write tests and execute them against linked list function stubs.
+1. Once enough tests are written, start implementing linked list functions while continuously re-running tests.
+1. Fix bugs in tests and code-under-test until everything passes.
+
+### Run Valgrind
+
+```text
+valgrind --leak-check=yes ./test_linked_list
+```
+
+```text
+==11258== Memcheck, a memory error detector
+==11258== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==11258== Using Valgrind-3.14.0 and LibVEX; rerun with -h for copyright info
+==11258== Command: ./test_linked_list
+==11258== 
+test_linked_list.c:430:test_ll_get:PASS
+test_linked_list.c:431:test_ll_length:PASS
+test_linked_list.c:432:test_ll_iterate:PASS
+test_linked_list.c:434:test_ll_append:PASS
+test_linked_list.c:435:test_ll_prepend:PASS
+test_linked_list.c:436:test_ll_set:PASS
+test_linked_list.c:437:test_ll_insert_after:PASS
+test_linked_list.c:438:test_ll_delete:PASS
+test_linked_list.c:439:test_ll_destroy:PASS
+test_linked_list.c:441:test_misc:PASS
+
+-----------------------
+10 Tests 0 Failures 0 Ignored 
+OK
+==11258== 
+==11258== HEAP SUMMARY:
+==11258==     in use at exit: 0 bytes in 0 blocks
+==11258==   total heap usage: 33 allocs, 33 frees, 1,536 bytes allocated
+==11258== 
+==11258== All heap blocks were freed -- no leaks are possible
+==11258== 
+==11258== For counts of detected and suppressed errors, rerun with: -v
+==11258== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+```
