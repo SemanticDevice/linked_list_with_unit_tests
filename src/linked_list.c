@@ -1,6 +1,7 @@
-#include "linked_list.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "linked_list.h"
 
 enum ll_status ll_append(struct ll_node **head, void *data) {
   if (head == NULL) {
@@ -143,12 +144,12 @@ enum ll_status ll_destroy(struct ll_node **head) {
 
 void *ll_get(struct ll_node *head, unsigned int idx) {
   unsigned int i = 0;
-  while (head && i < idx) {
+  while (head != NULL && i < idx) {
     i++;
     head = head->next;
   }
 
-  if (head && head->data) {
+  if (head != NULL && head->data != NULL) {
     return head->data;
   } else {
     return NULL;
@@ -157,7 +158,7 @@ void *ll_get(struct ll_node *head, unsigned int idx) {
 
 unsigned int ll_length(struct ll_node *head) {
   unsigned int i = 0;
-  while (head) {
+  while (head != NULL) {
     i++;
     head = head->next;
   }
@@ -167,7 +168,7 @@ unsigned int ll_length(struct ll_node *head) {
 void ll_iterate(struct ll_node *head,
                 enum ll_status (*cb)(struct ll_node *node, void *cookie),
                 void *cookie) {
-  while (head) {
+  while (head != NULL) {
     if (cb(head, cookie) == LL_FAIL) {
       return;
     }

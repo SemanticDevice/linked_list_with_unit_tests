@@ -1,16 +1,16 @@
-# Linked List in C with Unit Tests and Valgrind
+# Linked List in C with Unit Tests and a Valgrind Check
 
-Implementation of a linked list in C with [Unity](https://github.com/ThrowTheSwitch/Unity) unit tests and [Valgrind](http://valgrind.org/).
+Implementation of a generic (a.k.a. data type agnostic) singly linked list in C with [Unity](https://github.com/ThrowTheSwitch/Unity) unit tests and a [Valgrind](http://valgrind.org/) check for memory leaks.
 
-This is a project where test cases are developed before the implementation is written. Test cases serve as a debugging and verification tool used during development.
+This is a toy project to learn test case development using Unity and get a feel for a flow where test cases drive implementation and serve as a debugging and verification tool during development.
 
 ## Development Steps
 
 ### Install Unity
 
 1. Copy `unity.h`, `unity.c`, `unity_internals.h` from the [Unity repo](https://github.com/ThrowTheSwitch/Unity) to `test/unity`.
-1. Create an empty test file that follows the naming convention of prefexing the code-under-test file name (`linked_list.c`) with `test_` to get `test_linked_list.c`.
-1. Create a simple Makefile to build the test executable.
+2. Create an empty test file that follows the naming convention of prefexing the code-under-test file name (`linked_list.c`) with `test_` to get `test_linked_list.c`.
+3. Create a simple Makefile to build the test executable.
 
 Directory and file structure looks like this:
 
@@ -69,9 +69,9 @@ OK
 
 ### Write the Tests and Implement Linked List API
 
-As much as it would seem to be cleaner to write test cases independently of writing code-under-test, it is not practical because test code needs to be tested as well and without code-under-test to test the test code it is not possible. Sure, a simpler implementation of linked list API can be developed for the sole purpose of testing test code, but that's throw-away code and it itself needs to be tested. All this to say is that test case development and linked list implementation in this case was done iteratively.
+As much as it would seem to be cleaner to write test cases independently of writing code-under-test, it is not practical to expect test cases to be 100% complete prior to starting writing code-under-test. That is because test code needs to be tested also, and, without code-under-test to test the test code, that doesn't happen. Sure, a simpler implementation of linked list API can be developed for the sole purpose of testing test code, but that's throw-away code and this simple implementation itself needs to be tested. All this to say that test case development and linked list implementation in this case was done iteratively.
 
-Test code was structured so as not to rely on linked list functions to test other linked list functions. `ll_destroy()` was one unavoidable exception to that rule. This meant that test coded needed to create its own linked list to compare with the list produced by code-under-test, which, in turn, meant that test code needed to access internal `struct ll_node` members directly. This is fine until someone decides to make this into a doubly linked list for example, which will lead to the test code having to be modified while the API might not change. If test code did not rely on internal knowledge of node structure and only used linked list API for testing, then changing the nature of the linked list down the road may not require changing the tests.
+Test code was structured so as not to rely on linked list functions to test other linked list functions. (`ll_destroy()` in `void tearDown(void)` was one unavoidable exception.) This meant that test code needed to create its own linked list to compare with the list produced by code-under-test, which, in turn, meant that test code needed to access internal `struct ll_node` members directly. This is fine until someone decides to make this into a doubly linked list, for example, which will lead to the test code having to be modified while the API might not change. If test code did not rely on internal knowledge of node structure and only used linked list API for testing, then changing the nature of the linked list in the future may not require changing the tests.
 
 1. Write tests and execute them against linked list function stubs.
 1. Once enough tests are written, start implementing linked list functions while continuously re-running tests.

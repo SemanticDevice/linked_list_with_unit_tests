@@ -3,21 +3,34 @@
 #include "linked_list.h"
 #include "unity.h"
 
-// Global variables used by most tests
+// Global variables used by test cases
 
 // Number of strings available to expected and actual list to use as node data.
 // Changing NUM_STRS value is not enough to ensure tests run. Some tests do not
 // check the bounds of strs and exp_list.
 #define NUM_STRS (4)
-// String constants that comprize the data in the linked list
+
+// String constants that comprize the data in the linked list. I.e. linked lists
+// used in this test suite simply point to these strings for their data.
 const char *strs[] = {"Red", "Green", "Blue", "Violet"};
 
-// Hand-made expected that is compared to actual list produced by ll_ API
+// Hand-made expected that is compared to actual list produced via the linked
+// list API
 struct ll_node exp_list[NUM_STRS];
 
-// Head for the actual linked list produced by ll_ API
+// Head for the actual linked list produced by the linked list API
 struct ll_node *head = NULL;
 
+/**
+ * Create a linked list by hand. The list is composed of NUM_STRS nodes that use
+ * strings in the strs array for data. This list is used by test cases as the
+ * expected linked list to be compared to the actual list produced by the
+ * code-under-test linked list API.
+ *
+ * This function is called by Unity before every test function. No matter what a
+ * previous test case run did to exp_list, this function ensures that exp_list
+ * is in known state at the beginning of each test function execution.
+ */
 void setUp(void) {
   // Create the expected list
   for (unsigned int i = 0; i < NUM_STRS - 1; i++) {
@@ -31,6 +44,9 @@ void setUp(void) {
   head = NULL;
 }
 
+/**
+ * This function is called by Unity at the end of each test case.
+ */
 void tearDown(void) {
   ll_destroy(&head);
   head = NULL;
@@ -48,7 +64,7 @@ void tearDown(void) {
  */
 int lists_equal(struct ll_node *h1, struct ll_node *h2,
                 int (*equal)(void *d1, void *d2)) {
-  while (h1 && h2) {
+  while (h1 != NULL && h2 != NULL) {
     if (equal(h1->data, h2->data) == 0) {
       return 0;
     }
@@ -63,7 +79,7 @@ int lists_equal(struct ll_node *h1, struct ll_node *h2,
 
 int strs_equal(void *s1, void *s2) {
   if (s1 == s2) {
-    return 1;  // If s1 is pointing at the same location as s2 or both ar NULL
+    return 1;  // If s1 is pointing at the same location as s2 or both are NULL
   }
   if (s1 == NULL || s2 == NULL) {
     return 0;  // If one is NULL
@@ -252,6 +268,9 @@ void test_ll_length(void) {
   TEST_ASSERT_EQUAL(1, ll_length(&exp_list[0]));
 }
 
+/*
+ * Linked list iterator callback that counts number of times it's been called.
+ */
 enum ll_status count(struct ll_node *node, void *cookie) {
   (void)node;    // stop compiler complaints about unused parameter
   (void)cookie;  // stop compiler complaints about unused parameter
@@ -260,6 +279,10 @@ enum ll_status count(struct ll_node *node, void *cookie) {
   return LL_OK;
 }
 
+/*
+ * Linked list iterator callback that counts number of times it's been called
+ * and stops iteration at 2.
+ */
 enum ll_status stop_at_2(struct ll_node *node, void *cookie) {
   (void)node;  // stop compiler complaints about unused parameter
 
@@ -271,7 +294,8 @@ enum ll_status stop_at_2(struct ll_node *node, void *cookie) {
 }
 
 /*
- * Test access to linked list data in the iterator.
+ * Test access to linked list data in the iterator. The iterator copies link
+ * list data pointers to an array of pointers to strings.
  *
  * Cookie is a tripple char pointer (i.e. a pointer to a pointer to a string)
  */

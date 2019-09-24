@@ -15,17 +15,19 @@ struct ll_node {
 enum ll_status { LL_OK, LL_FAIL };
 
 /**
- * Append @p data to the tail of the linked list.
+ * Append a new node with @p data to the tail of the linked list.
  */
 enum ll_status ll_append(struct ll_node **head, void *data);
 
 /**
- * Prepend @p data to the head of the list. I.e. insert before the head.
+ * Prepend a new node with @p data to the head of the list. I.e. insert before
+ * the head.
  */
 enum ll_status ll_prepend(struct ll_node **head, void *data);
 
 /**
- * Set node at indiex @p idx to @p data.
+ * Set node at index @p idx to @p data. No new node is created. Data pointer is
+ * simply changed to point to @p data.
  */
 enum ll_status ll_set(struct ll_node *head, unsigned int idx, void *data);
 
@@ -36,7 +38,7 @@ enum ll_status ll_insert_after(struct ll_node **head, unsigned int idx,
                                void *data);
 
 /**
- * Delete list node at index @p idx.
+ * Delete node at index @p idx and deallocate memory allocated for it.
  */
 enum ll_status ll_delete(struct ll_node **head, unsigned int idx);
 
@@ -46,8 +48,8 @@ enum ll_status ll_delete(struct ll_node **head, unsigned int idx);
 enum ll_status ll_destroy(struct ll_node **head);
 
 /**
- * Return node data at index specified by @p idx. Return NULL if @p idx is out
- * of range.
+ * @return node data at index specified by @p idx.
+ * @return NULL if @p idx is out of range.
  */
 void *ll_get(struct ll_node *head, unsigned int idx);
 
@@ -65,5 +67,4 @@ unsigned int ll_length(struct ll_node *head);
 void ll_iterate(struct ll_node *head,
                 enum ll_status (*cb)(struct ll_node *node, void *cookie),
                 void *cookie);
-
 #endif  // LINKED_LIST_H
