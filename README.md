@@ -4,6 +4,8 @@ Implementation of a generic (a.k.a. data type agnostic) singly linked list in C 
 
 This is a toy project to learn test case development using Unity and get a feel for a flow where test cases drive implementation and serve as a debugging and verification tool during development.
 
+Build options in the Makefile are deliberately strict as far as warnings are concerned and also include the `-fsanitize=address` GCC flag which enables the address sanitizer. This flag is appropriate for building and running tests, but it should definitely not be used to build actual shippable code.
+
 ## Development Steps
 
 ### Install Unity
