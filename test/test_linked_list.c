@@ -14,8 +14,8 @@
 // used in this test suite simply point to these strings for their data.
 const char *strs[] = {"Red", "Green", "Blue", "Violet"};
 
-// Hand-made expected that is compared to actual list produced via the linked
-// list API
+// Hand-made expected linked list that is compared to actual list produced via
+// the linked list API
 struct ll_node exp_list[NUM_STRS];
 
 // Head for the actual linked list produced by the linked list API
@@ -90,22 +90,29 @@ int strs_equal(void *s1, void *s2) {
 void test_ll_append(void) {
   TEST_ASSERT_EQUAL(LL_FAIL, ll_append(NULL, NULL));  // head cannot be NULL
 
-  TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, NULL));  // it's OK to append NULL
+  // It's OK to append NULL. Append to an empty list.
+  TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, NULL));
   TEST_ASSERT_EQUAL_PTR(NULL, head->data);
+
+  // Change list data by hand so that it can be compared to the expected list
+  // Compare single-node lists
   head->data = (void *)strs[0];  // Fix up the append of NULL data
   exp_list[0].next = NULL;
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Append to a list with one element
   TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, (void *)strs[1]));
   exp_list[0].next = &exp_list[1];
   exp_list[1].next = NULL;
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Append to a list with two elements
   TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, (void *)strs[2]));
   exp_list[1].next = &exp_list[2];
   exp_list[2].next = NULL;
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Append again and make sure expected and actual lists are not the same
   TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, (void *)strs[0]));
   TEST_ASSERT_EQUAL(0, lists_equal(&exp_list[0], head, strs_equal));
 }
@@ -113,14 +120,19 @@ void test_ll_append(void) {
 void test_ll_prepend(void) {
   TEST_ASSERT_EQUAL(LL_FAIL, ll_prepend(NULL, NULL));  // head cannot be NULL
 
-  TEST_ASSERT_EQUAL(LL_OK, ll_prepend(&head, NULL));  // it's OK to prepend NULL
+  // It's OK to prepend NULL. Prepend to an empty list.
+  TEST_ASSERT_EQUAL(LL_OK, ll_prepend(&head, NULL));
   TEST_ASSERT_EQUAL_PTR(NULL, head->data);
-  head->data = (void *)strs[NUM_STRS - 1];  // Fix up the append of NULL data
+
+  // Fix up the append of NULL data and compare to the tail of the expected list
+  head->data = (void *)strs[NUM_STRS - 1];
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[NUM_STRS - 1], head, strs_equal));
 
+  // Prepend to a list with a single node
   TEST_ASSERT_EQUAL(LL_OK, ll_prepend(&head, (void *)strs[NUM_STRS - 2]));
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[NUM_STRS - 2], head, strs_equal));
 
+  // Prepend to a list with a two nodes
   TEST_ASSERT_EQUAL(LL_OK, ll_prepend(&head, (void *)strs[NUM_STRS - 3]));
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[NUM_STRS - 3], head, strs_equal));
 }
@@ -132,6 +144,7 @@ void test_ll_set(void) {
   TEST_ASSERT_EQUAL(LL_OK, ll_set(&exp_list[0], 0, NULL));
   TEST_ASSERT_EQUAL_PTR(NULL, exp_list[0].data);
 
+  // Set data in the expected list to various values
   TEST_ASSERT_EQUAL(LL_OK, ll_set(&exp_list[0], 0, (void *)strs[0]));
   TEST_ASSERT_EQUAL_STRING(strs[0], (char *)exp_list[0].data);
 
@@ -144,8 +157,10 @@ void test_ll_set(void) {
   TEST_ASSERT_EQUAL(LL_OK, ll_set(&exp_list[0], 3, (void *)"End"));
   TEST_ASSERT_EQUAL_STRING("End", (char *)exp_list[3].data);
 
-  // Out of bounds index
+  // Test out of bounds index
   TEST_ASSERT_EQUAL(LL_FAIL, ll_set(&exp_list[0], 4, (void *)"Error"));
+
+  // Check integrity of the list data
   TEST_ASSERT_EQUAL_STRING(strs[0], (char *)exp_list[0].data);
   TEST_ASSERT_EQUAL_STRING("test", (char *)exp_list[1].data);
   TEST_ASSERT_EQUAL_STRING("Grey", (char *)exp_list[2].data);
@@ -159,22 +174,28 @@ void test_ll_insert_after(void) {
   // cannot insert after a non-existent index
   TEST_ASSERT_EQUAL(LL_FAIL, ll_insert_after(&head, 0, NULL));
 
+  // Add a single node and insert a new node after it
   TEST_ASSERT_EQUAL(LL_OK, ll_prepend(&head, (void *)strs[0]));
   TEST_ASSERT_EQUAL(LL_OK, ll_insert_after(&head, 0, (void *)strs[2]));
+
   // At this point the list is {strs[0], strs[2]}, so set exp_list to this
   exp_list[0].next = &exp_list[2];
   exp_list[2].next = NULL;
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Insert between nodes
   TEST_ASSERT_EQUAL(LL_OK, ll_insert_after(&head, 0, (void *)strs[1]));
   exp_list[0].next = &exp_list[1];
   exp_list[1].next = &exp_list[2];
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Insert at the tail end of the list
   TEST_ASSERT_EQUAL(LL_OK, ll_insert_after(&head, 2, (void *)strs[3]));
   exp_list[2].next = &exp_list[3];
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Insert at the tail end of the list and check that the actual list is not
+  // equal to expected
   TEST_ASSERT_EQUAL(LL_OK, ll_insert_after(&head, 3, (void *)strs[0]));
   TEST_ASSERT_EQUAL(0, lists_equal(&exp_list[0], head, strs_equal));
 }
@@ -257,13 +278,20 @@ void test_ll_get(void) {
 }
 
 void test_ll_length(void) {
+  // Length with a NULL parameter should be 0
   TEST_ASSERT_EQUAL(0, ll_length(NULL));
 
+  // Length of an empty list should be 0
+  TEST_ASSERT_EQUAL(0, ll_length(head));
+
+  // Length of expected list is NUM_STRS
   TEST_ASSERT_EQUAL(NUM_STRS, ll_length(&exp_list[0]));
 
+  // Length of 2-node list
   exp_list[1].next = NULL;
   TEST_ASSERT_EQUAL(2, ll_length(&exp_list[0]));
 
+  // Length of 1-node list
   exp_list[0].next = NULL;
   TEST_ASSERT_EQUAL(1, ll_length(&exp_list[0]));
 }
@@ -314,34 +342,49 @@ void test_ll_iterate(void) {
   char **strs_iter = &strs_from_list[0];
   unsigned int cnt = 0;
 
+  // Iterate with NULL parameter. Should not call the callback at all
   ll_iterate(NULL, count, &cnt);
   TEST_ASSERT_EQUAL(0, cnt);
 
+  // Iterate over an empty list. Should not call the callback at all
+  cnt = 0;
+  ll_iterate(head, count, &cnt);
+  TEST_ASSERT_EQUAL(0, cnt);
+
+  // Iterate over the expected list
   cnt = 0;
   ll_iterate(&exp_list[0], count, &cnt);
-  TEST_ASSERT_EQUAL(4, cnt);
+  TEST_ASSERT_EQUAL(NUM_STRS, cnt);
 
+  // Test terminating the iteration
   cnt = 0;
   ll_iterate(&exp_list[0], stop_at_2, &cnt);
   TEST_ASSERT_EQUAL(2, cnt);
 
+  // Test access to node data inside the callback
   ll_iterate(&exp_list[0], add_str, &strs_iter);
   for (int i = 0; i < NUM_STRS; i++) {
     TEST_ASSERT_EQUAL_STRING(strs[i], strs_from_list[i]);
   }
 
+  // Iterate over a list with a single node
   exp_list[0].next = NULL;
   cnt = 0;
   ll_iterate(&exp_list[0], count, &cnt);
   TEST_ASSERT_EQUAL(1, cnt);
 }
 
+// Miscellaneous tests designed to test (non-exhaustively) list operations done
+// sequentially in case there are any odd side effects from one function
+// to another.
 void test_misc(void) {
   unsigned int cnt = 0;
 
+  // Iterate over an empty list
   ll_iterate(head, count, &cnt);
   TEST_ASSERT_EQUAL(0, cnt);
 
+  // Append to an empty list. Test append, length, get, iteration
   TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, (void *)strs[1]));
   TEST_ASSERT_EQUAL(1, ll_length(head));
   TEST_ASSERT_EQUAL_STRING(strs[1], ll_get(head, 0));
@@ -351,6 +394,7 @@ void test_misc(void) {
   exp_list[1].next = NULL;
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[1], head, strs_equal));
 
+  // Prepend to a 1-node list. Test prepend, length, get, iterate
   TEST_ASSERT_EQUAL(LL_OK, ll_prepend(&head, (void *)strs[0]));
   TEST_ASSERT_EQUAL(2, ll_length(head));
   TEST_ASSERT_EQUAL_STRING(strs[0], ll_get(head, 0));
@@ -361,6 +405,7 @@ void test_misc(void) {
   TEST_ASSERT_EQUAL(2, cnt);
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Delete head node. Test delete, length, get, iterate
   TEST_ASSERT_EQUAL(LL_OK, ll_delete(&head, 0));
   TEST_ASSERT_EQUAL(1, ll_length(head));
   TEST_ASSERT_EQUAL_STRING(strs[1], ll_get(head, 0));
@@ -370,6 +415,7 @@ void test_misc(void) {
   TEST_ASSERT_EQUAL(1, cnt);
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[1], head, strs_equal));
 
+  // Chagne node 0 data. Test length, get, out-of-bounds get, iterate
   TEST_ASSERT_EQUAL(LL_OK, ll_set(head, 0, (void *)strs[0]));
   TEST_ASSERT_EQUAL(1, ll_length(head));
   TEST_ASSERT_EQUAL_STRING(strs[0], ll_get(head, 0));
@@ -378,6 +424,8 @@ void test_misc(void) {
   ll_iterate(head, count, &cnt);
   TEST_ASSERT_EQUAL(1, cnt);
 
+  // Append 2 nodes and insert another. Test append, insert, length, get,
+  // out-of-bounds get, iterate
   TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, (void *)strs[1]));
   TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, (void *)strs[3]));
   TEST_ASSERT_EQUAL(LL_OK, ll_insert_after(&head, 1, (void *)strs[2]));
@@ -393,9 +441,12 @@ void test_misc(void) {
   exp_list[1].next = &exp_list[2];
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Insert after head. Test insert, length
   TEST_ASSERT_EQUAL(LL_OK, ll_insert_after(&head, 0, (void *)strs[0]));
   TEST_ASSERT_EQUAL(5, ll_length(head));
   TEST_ASSERT_EQUAL(0, lists_equal(&exp_list[0], head, strs_equal));
+
+  // Delete head, test delete, length, get
   TEST_ASSERT_EQUAL(LL_OK, ll_delete(&head, 0));
   TEST_ASSERT_EQUAL(4, ll_length(head));
   TEST_ASSERT_EQUAL_STRING(strs[0], ll_get(head, 0));
@@ -404,6 +455,7 @@ void test_misc(void) {
   TEST_ASSERT_EQUAL_STRING(strs[3], ll_get(head, 3));
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Delete last element. Test delete, length, iterate
   TEST_ASSERT_EQUAL(LL_OK, ll_delete(&head, 3));
   TEST_ASSERT_EQUAL(3, ll_length(head));
   cnt = 0;
@@ -412,6 +464,7 @@ void test_misc(void) {
   exp_list[2].next = NULL;
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Append. Test append, length, iterate
   TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, (void *)strs[0]));
   TEST_ASSERT_EQUAL_STRING(strs[0], ll_get(head, 3));
   TEST_ASSERT_EQUAL(4, ll_length(head));
@@ -421,6 +474,7 @@ void test_misc(void) {
   exp_list[2].next = &exp_list[3];
   TEST_ASSERT_EQUAL(0, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Change tail's data. Test set, length, iterate
   TEST_ASSERT_EQUAL(LL_OK, ll_set(head, 3, (void *)strs[3]));
   TEST_ASSERT_EQUAL_STRING(strs[3], ll_get(head, 3));
   TEST_ASSERT_EQUAL(4, ll_length(head));
@@ -429,6 +483,7 @@ void test_misc(void) {
   TEST_ASSERT_EQUAL(4, cnt);
   TEST_ASSERT_EQUAL(1, lists_equal(&exp_list[0], head, strs_equal));
 
+  // Destroy the list. Test destroy, length, iterate over empty list
   TEST_ASSERT_EQUAL(LL_OK, ll_destroy(&head));
   TEST_ASSERT_EQUAL_PTR(NULL, ll_get(head, 3));
   TEST_ASSERT_EQUAL(0, ll_length(head));
@@ -436,6 +491,8 @@ void test_misc(void) {
   ll_iterate(head, count, &cnt);
   TEST_ASSERT_EQUAL(0, cnt);
 
+  // Create another list. Test whether a pointer that used to be a list that was
+  // destroyed can still be used for a new list
   TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, (void *)strs[0]));
   TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, (void *)strs[1]));
   TEST_ASSERT_EQUAL(LL_OK, ll_append(&head, (void *)strs[2]));
